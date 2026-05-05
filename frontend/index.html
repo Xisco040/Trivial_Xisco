@@ -24,5 +24,53 @@
             <input type="text" id="room-code" placeholder="Codi de sala">
             <button onclick="unirseSala()">Unirse a una Sala</button>
         </div>
+
+        <div id="lobby" class="hidden">
+            <h2 id="room-title">Sala:</h2>
+            <p>Jugadores:</p>
+            <ul id="player-list"></ul>
+            <div id="equipos-lobby"></div>
+            <button id="start-button" onclick="empezarPartida()">Comenzar Partida</button>
+        </div>
+
+        <div id="game" class="hidden">
+            <div id="question-container">
+                <h2 id="question-text">Pregunta</h2>
+                <div id="options"></div>
+                <p id="timer"></p>
+            </div>
+        </div>
+
+        <div id="configuracion-juego" class="hidden">
+            <label>Rondas: <input type="number" id="num-rondas" value="5" min="1" max="20"></label>
+            <label>Tiempo por pregunta: <input type="number" id="tiempo-pregunta" value="10" min="5" max="60"></label>
+        </div>
+
+        <div id="result" class="hidden">
+            <h2 id="result-text">Clasificacion</h2>
+            <button onclick="mostrarClasificacion()">Ver Clasifiación</button>
+        </div>
+
+        <div id="scoreboard" class="hidden">
+            <h2>Clasifiación</h2>
+            <ul id="score-list"></ul>
+        </div>
     </div>
+
+    <footer>
+        <div class="footer-content">
+            <p>
+                <i class="fa-solid fa-film"></i>
+                Desarollado por
+                <a href="https://github.com/Xisco040/Trivial_Xisco" target="_blank">Xisco Sbert</a>
+                <i class="fa-brands fa-github"></i>
+            </p>
+            <p class="footer-small">Trivial de Peliculas &copy; 2026</p>
+        </div>
+    </footer>
+
+    <script src="./api/mockData.js"></script>
+    <script src="index.js"></script>
 </body>
+
+</html>
