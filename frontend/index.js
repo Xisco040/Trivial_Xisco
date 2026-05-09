@@ -130,3 +130,79 @@ function mostrarEquiposLobby(jugadores) {
     cont.appendChild(div);
   });
 } 
+
+// Guarda la configuración cuando el anfitrión la cambia
+document.getElementById("num-rondas").addEventListener("change", function() {
+  configuracionJuego.rondas = parseInt(this.value);
+});
+document.getElementById("tiempo-pregunta").addEventListener("change", function() {
+  configuracionJuego.tiempoPregunta = parseInt(this.value);
+});
+
+// Empieza la partida
+function empezarPartida() {
+  rondaActual = 1;
+
+  document.getElementById("lobby").classList.add("hidden");
+  document.getElementById("create-join-room").classList.add("hidden");
+  document.getElementById("configuracion-juego").classList.add("hidden");
+
+
+  fetchMock("/api/startGame", { 
+    roomId: salaActualId,
+    rondas: configuracionJuego.rondas,
+    tiempoPregunta: configuracionJuego.tiempoPregunta
+  }).then(() => {
+    cargarSiguientePregunta();
+  });
+}
+
+// Carga la siguiente pregunta
+function cargarSiguientePregunta() {
+  document.getElementById("game").classList.add("hidden");
+
+  // Si ya hemos llegado al máximo de rondas, termina la partida
+  if (rondaActual > configuracionJuego.rondas) {
+    mostrarClasificacion(true);
+    return;
+  }
+
+  fetchMock("/api/nextQuestion", { roomId: salaActualId }).then(res => {
+    if (res.finished) {
+      mostrarClasificacion(true);
+    } else {
+      preguntaActualId = res.questionId;
+      preguntaActual = res;
+      document.getElementById("question-text").textContent = res.text;
+      const opcionesDiv = document.getElementById("options");
+      opcionesDiv.innerHTML = "";
+
+      res.options.forEach(opcion => {
+        const btn = document.createElement("button");
+        btn.textContent = opcion.text;
+        btn.onclick = () => enviarRespuesta(opcion.optionId, configuracionJuego.tiempoPregunta);        opcionesDiv.appendChild(btn);
+      });
+
+      iniciarTemporizador(configuracionJuego.tiempoPregunta);
+
+      document.getElementById("game").classList.remove("hidden");
+    }
+  });
+}
+
+// Inicia el temporizador para responder la pregunta
+function iniciarTemporizador(segundos) {
+  const timerEl = document.getElementById("timer");
+  let restante = segundos;
+  timerEl.textContent = `Tiempo restante: ${restante}s`;
+
+  clearInterval(temporizadorActual);
+  temporizadorActual = setInterval(() => {
+    restante--;
+    timerEl.textContent = `Tiempo restante: ${restante}s`;
+    if (restante <= 0) {
+      clearInterval(temporizadorActual);
+      enviarRespuesta(null, segundos); // No respondió
+    }
+  }, 1000);
+}
