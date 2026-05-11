@@ -206,3 +206,52 @@ function iniciarTemporizador(segundos) {
     }
   }, 1000);
 }
+
+// Envía la respuesta del usuario
+function enviarRespuesta(opcionId, tiempoLimite) {
+  clearInterval(temporizadorActual);
+  const segundosTranscurridos = tiempoLimite - parseInt(document.getElementById("timer").textContent.split(": ")[1]);
+  fetchMock("/api/submitAnswer", {
+    roomId: salaActualId,
+    userId: usuarioActual.usuarioId,
+    optionId: opcionId,
+    elapsedSec: segundosTranscurridos,
+    tiempoPregunta: configuracionJuego.tiempoPregunta,
+  }).then(res => {  
+    const opcionesDiv = document.getElementById("options");
+    const botones = opcionesDiv.querySelectorAll("button");
+    botones.forEach(btn => {
+    const opcion = preguntaActual.options.find(o => o.text === btn.textContent);      // Busca la opción correcta
+      if (opcion.optionId === preguntaActual.correctOptionId) {
+        btn.classList.add("opcion-correcta");
+      } else if (opcion.optionId === opcionId) {
+        btn.classList.add("opcion-incorrecta");
+      }
+      btn.disabled = true;
+  });
+
+  setTimeout(() => {
+    document.getElementById("game").classList.add("hidden");
+    document.getElementById("result").classList.remove("hidden");
+    document.getElementById("result-text").textContent = res.correct
+      ? "✅ ¡Correcto!"
+      : "❌ ¡Incorrecto!";
+    }, 1200);
+});
+}
+
+// Muestra la clasificación
+function mostrarClasificacion(fin = false) {
+  fetchMock("/api/scoreboard", { roomId: salaActualId }).then(res => {
+    const lista = document.getElementById("score-list");
+    lista.innerHTML = "";
+
+    // Agrupa por equipo
+    const equipos = {};
+    res.players.forEach(jugador => {
+      const eq = equiposJugadores[jugador.username] || equiposDisponibles[0];
+      if (!equipos[eq]) equipos[eq] = [];
+      equipos[eq].push(jugador);
+    });
+  });
+}
