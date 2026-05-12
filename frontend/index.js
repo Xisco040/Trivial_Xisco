@@ -31,7 +31,7 @@ function crearSala() {
     document.getElementById("room-title").textContent = `Sala: ${salaActualId}`;
     refrescarLobby();
     setTimeout(mostrarLobby, 120);
-    
+
   });
 }
 
@@ -129,13 +129,13 @@ function mostrarEquiposLobby(jugadores) {
     }
     cont.appendChild(div);
   });
-} 
+}
 
 // Guarda la configuración cuando el anfitrión la cambia
-document.getElementById("num-rondas").addEventListener("change", function() {
+document.getElementById("num-rondas").addEventListener("change", function () {
   configuracionJuego.rondas = parseInt(this.value);
 });
-document.getElementById("tiempo-pregunta").addEventListener("change", function() {
+document.getElementById("tiempo-pregunta").addEventListener("change", function () {
   configuracionJuego.tiempoPregunta = parseInt(this.value);
 });
 
@@ -148,7 +148,7 @@ function empezarPartida() {
   document.getElementById("configuracion-juego").classList.add("hidden");
 
 
-  fetchMock("/api/startGame", { 
+  fetchMock("/api/startGame", {
     roomId: salaActualId,
     rondas: configuracionJuego.rondas,
     tiempoPregunta: configuracionJuego.tiempoPregunta
@@ -180,7 +180,7 @@ function cargarSiguientePregunta() {
       res.options.forEach(opcion => {
         const btn = document.createElement("button");
         btn.textContent = opcion.text;
-        btn.onclick = () => enviarRespuesta(opcion.optionId, configuracionJuego.tiempoPregunta);        opcionesDiv.appendChild(btn);
+        btn.onclick = () => enviarRespuesta(opcion.optionId, configuracionJuego.tiempoPregunta); opcionesDiv.appendChild(btn);
       });
 
       iniciarTemporizador(configuracionJuego.tiempoPregunta);
@@ -217,27 +217,27 @@ function enviarRespuesta(opcionId, tiempoLimite) {
     optionId: opcionId,
     elapsedSec: segundosTranscurridos,
     tiempoPregunta: configuracionJuego.tiempoPregunta,
-  }).then(res => {  
+  }).then(res => {
     const opcionesDiv = document.getElementById("options");
     const botones = opcionesDiv.querySelectorAll("button");
     botones.forEach(btn => {
-    const opcion = preguntaActual.options.find(o => o.text === btn.textContent);      // Busca la opción correcta
+      const opcion = preguntaActual.options.find(o => o.text === btn.textContent);      // Busca la opción correcta
       if (opcion.optionId === preguntaActual.correctOptionId) {
         btn.classList.add("opcion-correcta");
       } else if (opcion.optionId === opcionId) {
         btn.classList.add("opcion-incorrecta");
       }
       btn.disabled = true;
-  });
+    });
 
-  setTimeout(() => {
-    document.getElementById("game").classList.add("hidden");
-    document.getElementById("result").classList.remove("hidden");
-    document.getElementById("result-text").textContent = res.correct
-      ? "✅ ¡Correcto!"
-      : "❌ ¡Incorrecto!";
+    setTimeout(() => {
+      document.getElementById("game").classList.add("hidden");
+      document.getElementById("result").classList.remove("hidden");
+      document.getElementById("result-text").textContent = res.correct
+        ? "✅ ¡Correcto!"
+        : "❌ ¡Incorrecto!";
     }, 1200);
-});
+  });
 }
 
 // Muestra la clasificación
@@ -253,5 +253,46 @@ function mostrarClasificacion(fin = false) {
       if (!equipos[eq]) equipos[eq] = [];
       equipos[eq].push(jugador);
     });
+
+    // Suma puntos por equipo
+    const equiposPuntos = Object.entries(equipos).map(([nombre, jugadores]) => ({
+      nombre,
+      puntos: jugadores.reduce((acc, j) => acc + j.score, 0),
+      jugadores
+    })).sort((a, b) => b.puntos - a.puntos);
+
+    // Muestra equipos y jugadores
+    equiposPuntos.forEach(equipo => {
+      const liEquipo = document.createElement("li");
+      liEquipo.textContent = `Equipo ${equipo.nombre}: ${equipo.puntos} pts`;
+      liEquipo.style.fontWeight = "bold";
+      liEquipo.style.color = coloresEquipos[equipo.nombre] || "#ffd700";
+      lista.appendChild(liEquipo);
+      equipo.jugadores
+        .sort((a, b) => b.score - a.score)
+        .forEach(jugador => {
+          const li = document.createElement("li");
+          li.textContent = `- ${jugador.username}: ${jugador.score} pts`;
+          li.style.marginLeft = "18px";
+          lista.appendChild(li);
+        });
+    });
+
+    document.getElementById("result").classList.add("hidden");
+    document.getElementById("scoreboard").classList.remove("hidden");
+
+    if (fin) {
+      let h2 = document.querySelector("#scoreboard h2");
+      h2.textContent = "¡Partida finalizada!";
+      document.getElementById("game").classList.add("hidden");
+      return;
+    }
+
+    setTimeout(() => {
+      rondaActual++;
+      document.getElementById("scoreboard").classList.add("hidden");
+      document.getElementById("game").classList.remove("hidden");
+      cargarSiguientePregunta();
+    }, 3000);
   });
 }
