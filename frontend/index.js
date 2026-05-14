@@ -296,3 +296,25 @@ function mostrarClasificacion(fin = false) {
     }, 3000);
   });
 }
+
+function volverAlInicio() {
+  // Resetea variables globales
+  usuarioActual = {};
+  salaActualId = null;
+  preguntaActualId = null;
+  clearInterval(temporizadorActual);
+
+  // Limpia campos de texto si es necesario
+  document.getElementById("username").value = "";
+  if (document.getElementById("room-code")) document.getElementById("room-code").value = "";
+
+  // Oculta todas las pantallas
+  document.getElementById("lobby").classList.add("hidden");
+  document.getElementById("game").classList.add("hidden");
+  document.getElementById("result").classList.add("hidden");
+  document.getElementById("scoreboard").classList.add("hidden");
+  document.querySelector("#scoreboard h2").textContent = "Clasificación";
+
+  // Muestra la pantalla inicial
+  document.getElementById("create-join-room").classList.remove("hidden");
+}
