@@ -212,16 +212,6 @@ var mockDB = {
             res = { roomId: roomId, host: room.host };
             break;
   
-          case "/api/joinRoom":
-            room = mockDB.rooms[payload.roomId];
-            if (!room) {
-              res = { success: false, message: "Sala no encontrada" };
-            } else {
-              player = { userId: Date.now(), username: payload.username, score: 0 };
-              room.players.push(player);
-              res = { success: true, roomId: room.roomId, players: room.players };
-            }
-            break;
   
           case "/api/roomStatus":
             room = mockDB.rooms[payload.roomId];

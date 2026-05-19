@@ -35,23 +35,6 @@ function crearSala() {
   });
 }
 
-// Unirse a una sala existente
-function unirseSala() {
-  const nombreUsuario = document.getElementById("username").value;
-  const salaId = document.getElementById("room-code").value;
-  if (!nombreUsuario || !salaId) return alert("Faltan datos");
-
-  const usuarioId = Date.now();
-  usuarioActual = { usuarioId, nombreUsuario };
-
-  fetchMock("/api/joinRoom", { username: nombreUsuario, roomId: salaId }).then(res => {
-    if (!res.success) return alert(res.message);
-    salaActualId = res.roomId;
-    document.getElementById("room-title").textContent = `Sala: ${salaActualId}`;
-    refrescarLobby();
-    setTimeout(mostrarLobby, 120);
-  });
-}
 
 // Detecta si eres el anfitrión (el primer jugador de la sala)
 function esAnfitrion() {
@@ -306,7 +289,6 @@ function volverAlInicio() {
 
   // Limpia campos de texto si es necesario
   document.getElementById("username").value = "";
-  if (document.getElementById("room-code")) document.getElementById("room-code").value = "";
 
   // Oculta todas las pantallas
   document.getElementById("lobby").classList.add("hidden");
