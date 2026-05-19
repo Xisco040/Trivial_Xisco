@@ -1,4 +1,9 @@
 services:
+frontend:
+    build:
+      context: ./frontend
+    ports:
+      - 5500:80
   server:
     build:
       context: .
