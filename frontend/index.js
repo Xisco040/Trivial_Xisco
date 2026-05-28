@@ -63,20 +63,16 @@ function refrescarLobby() {
 
 // Muestra la pantalla del lobby
 function mostrarLobby() {
+
   document.getElementById("create-join-room").classList.add("hidden");
   document.getElementById("lobby").classList.remove("hidden");
+
   refrescarLobby();
 
-  // Si eres el anfitrión, muestra la configuración
-  setTimeout(() => {
-    if (esAnfitrion()) {
-      document.getElementById("configuracion-juego").classList.remove("hidden");
-      document.getElementById("num-rondas").value = configuracionJuego.rondas;
-      document.getElementById("tiempo-pregunta").value = configuracionJuego.tiempoPregunta;
-    } else {
-      document.getElementById("configuracion-juego").classList.add("hidden");
-    }
-  }, 200);
+  // Mostrar siempre configuración
+  document.getElementById("configuracion-juego").classList.remove("hidden");
+  document.getElementById("num-rondas").value = configuracionJuego.rondas;
+  document.getElementById("tiempo-pregunta").value = configuracionJuego.tiempoPregunta;
 }
 
 //Muestra selección de equipo en el lobby
