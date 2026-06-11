@@ -291,6 +291,7 @@ function volverAlInicio() {
   document.getElementById("game").classList.add("hidden");
   document.getElementById("result").classList.add("hidden");
   document.getElementById("scoreboard").classList.add("hidden");
+   document.getElementById("configuracion-juego").classList.add("hidden");
   document.querySelector("#scoreboard h2").textContent = "Clasificación";
 
   // Muestra la pantalla inicial
