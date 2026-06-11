@@ -91,13 +91,14 @@ function mostrarEquiposLobby(jugadores) {
       const select = document.createElement("select");
       equiposDisponibles.forEach(eq => {
         const opt = document.createElement("option");
+        // Asigno el nombre del equipo a la opcion
         opt.value = eq;
         opt.textContent = eq;
         if ((equiposJugadores[jugador.username] || equiposDisponibles[0]) === eq) opt.selected = true;
         select.appendChild(opt);
       });
       select.onchange = () => {
-        equiposJugadores[jugador.username] = select.value;
+        equiposJugadores[jugador.username] = select.value; // guarda el nuevo equipo
         mostrarEquiposLobby(jugadores); // refresca para mostrar cambios
       };
       div.appendChild(select);
@@ -200,7 +201,7 @@ function enviarRespuesta(opcionId, tiempoLimite) {
     const opcionesDiv = document.getElementById("options");
     const botones = opcionesDiv.querySelectorAll("button");
     botones.forEach(btn => {
-      const opcion = preguntaActual.options.find(o => o.text === btn.textContent);      // Busca la opción correcta
+      const opcion = preguntaActual.options.find(o => o.text === btn.textContent);// Busca la opción correcta
       if (opcion.optionId === preguntaActual.correctOptionId) {
         btn.classList.add("opcion-correcta");
       } else if (opcion.optionId === opcionId) {
@@ -229,7 +230,7 @@ function mostrarClasificacion(fin = false) {
     const equipos = {};
     res.players.forEach(jugador => {
       const eq = equiposJugadores[jugador.username] || equiposDisponibles[0];
-      if (!equipos[eq]) equipos[eq] = [];
+      if (!equipos[eq]) equipos[eq] = []; // creamos equipo si no existe
       equipos[eq].push(jugador);
     });
 
