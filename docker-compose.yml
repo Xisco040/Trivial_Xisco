@@ -1,33 +1,38 @@
 services:
-
-  frontend:
-    build:
-      context: ./frontend
-    ports:
-      - "5500:80"
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
 
   server:
     build:
       context: .
       target: development
     ports:
-      - 8000:8000
-      - 8080:8080
+       - 3000:8080
     depends_on:
       db:
         condition: service_healthy
     environment:
       - POSTGRES_URL=jdbc:postgresql://db:5432/postgres?user=postgres&password=postgres
+      - JWT_SECRET=${JWT_SECRET:-xHMaro8aNn82Lo2y5zyiBmOz2NuHyXtauex28293dXY=}
+      - CORS_ALLOWED_ORIGIN_PATTERNS=${CORS_ALLOWED_ORIGIN_PATTERNS:-http://localhost:*}
+    develop:
+      watch:
+        - action: rebuild
+          path: .
 
   db:
-    image: postgres:16.3-alpine
+    image: postgres:17
     restart: unless-stopped
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-    ports:
-      - 5433:5432
+    # ports:
+      # - 5432:5432
     volumes:
       - db-data:/var/lib/postgresql/data
       - ./initdb:/docker-entrypoint-initdb.d
@@ -37,18 +42,15 @@ services:
       timeout: 10s
       retries: 5
 
-  pgadmin:
-    image: dpage/pgadmin4
+  redis:
+    image: redis:8
     restart: unless-stopped
-    environment:
-      - PGADMIN_DEFAULT_SERVER=db
-      - PGADMIN_DEFAULT_EMAIL=postgres@example.com
-      - PGADMIN_DEFAULT_PASSWORD=postgres
-    ports:
-      - 8081:80
-    depends_on:
-      db:
-        condition: service_healthy
+    # ports:
+    #   - 6379:6379
+    command: redis-server --save 20 1 --loglevel warning --requirepass redis
+    volumes:
+      - redis-data:/data
 
 volumes:
   db-data:
+  redis-data:
