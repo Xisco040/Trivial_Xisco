@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:3000";
+const API_URL = "https://triviaapi.artemrudenko.com";
 
 // Estado de la sesión
 let token = null;
@@ -15,10 +15,10 @@ let rondaActual = null;
 let preguntaActual = null;
 let respuestaEnviada = null;
 let respuestasRonda = 0;
-let puntuaciones = {}; // playerId -> puntos
+let puntuaciones = {};
 let enPartida = false;
 let clasificacionMostrada = false;
-let desfaseReloj = 0; // diferencia entre el reloj del servidor y el local (ms)
+let desfaseReloj = 0; 
 let temporizadorActual = null;
 
 // Estado del lobby
@@ -37,7 +37,7 @@ const coloresEquipos = {
   Amarillo: "#ffd600"
 };
 
-// Llama a la API REST 
+// Llama a la API REST (conecta frontend y backend) 
 async function api(ruta, opciones = {}) {
   const cabeceras = { ...(opciones.headers || {}) };
   if (token) cabeceras["Authorization"] = `Bearer ${token}`;
@@ -47,11 +47,11 @@ async function api(ruta, opciones = {}) {
   return res.status === 204 ? null : res.json();
 }
 
-function dormir(ms) {
+function esperar(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// Reintenta una llamada
+// Reintenta una llamada por si algo falla
 async function reintentar(fn, intentos = 8, espera = 500) {
   let error;
   for (let i = 0; i < intentos; i++) {
@@ -59,12 +59,12 @@ async function reintentar(fn, intentos = 8, espera = 500) {
       return await fn();
     } catch (e) {
       error = e;
-      await dormir(espera);
+      await esperar(espera);
     }
   }
   throw error;
 }
-
+// Sincorniza la hora
 function ahoraServidor() {
   return Date.now() + desfaseReloj;
 }
@@ -117,7 +117,7 @@ async function unirseSala() {
     await asignarmeAlPrimerEquipo();
     await mostrarLobby();
   } catch (e) {
-    alert("No se pudo entrar en la sala: " + e.message);
+    alert("No se pudo entrar en la sala: ");
   }
 }
 
@@ -130,9 +130,6 @@ async function entrarEnSala(roomId, nombreUsuario, code) {
   token = res.token;
   jugadorActualId = parseInt(JSON.parse(atob(token.split(".")[1])).sub);
   salaActualId = roomId;
-
-  // URL compartible para que otros jugadores se unan
-  history.replaceState(null, "", `?room=${roomId}`);
 
   conectarEventosSala();
 }
@@ -339,7 +336,7 @@ async function jugarRonda() {
 
   // Espera a que el servidor dé comienzo a la ronda
   const espera = Date.parse(rondaActual.createdAt) - ahoraServidor();
-  if (espera > 0) await dormir(espera + 200);
+  if (espera > 0) await esperar(espera + 200);
 
   let preguntas;
   try {
@@ -431,11 +428,11 @@ async function enviarRespuesta(respuesta) {
 // Finaliza la ronda
 async function finalizarRonda() {
   document.getElementById("timer").textContent = "¡Tiempo!";
-  await dormir(800); 
+  await esperar(800); 
 
   let preguntas = await reintentar(() => api(`/questions?roundId=${rondaActual.id}`));
   for (let i = 0; i < 5 && !(preguntas[0].correctAnswers || []).length; i++) {
-    await dormir(400);
+    await esperar(400);
     preguntas = await api(`/questions?roundId=${rondaActual.id}`);
   }
   const correctas = preguntas[0].correctAnswers || [];
