@@ -273,7 +273,7 @@ function mostrarEquiposLobby() {
     if (esAnfitrion() || jugador.id === jugadorActualId) {
       if (esAnfitrion() && jugador.id !== jugadorActualId) {
     const btnExpulsar = document.createElement("button");
-    btnExpulsar.textContent = "❌";
+    btnExpulsar.textContent = "Expulsar";
     btnExpulsar.onclick = () => expulsarJugador(jugador.id);
 
     div.appendChild(btnExpulsar);
