@@ -232,6 +232,31 @@ async function refrescarLobby() {
   document.getElementById("configuracion-juego").classList.toggle("hidden", !esAnfitrion());
 }
 
+async function expulsarJugador(playerId) {
+  try {
+
+    const response = await fetch(
+      `${API_URL}/players/${playerId}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("No se pudo expulsar al jugador");
+    }
+
+    refrescarLobby();
+
+  } catch (error) {
+    console.error(error);
+    alert("Error expulsando jugador");
+  }
+}
+
 //Muestra selección de equipo en el lobby
 function mostrarEquiposLobby() {
   const cont = document.getElementById("equipos-lobby");
@@ -246,6 +271,13 @@ function mostrarEquiposLobby() {
 
     // Solo el anfitrión o el propio jugador puede cambiar su equipo
     if (esAnfitrion() || jugador.id === jugadorActualId) {
+      if (esAnfitrion() && jugador.id !== jugadorActualId) {
+    const btnExpulsar = document.createElement("button");
+    btnExpulsar.textContent = "❌";
+    btnExpulsar.onclick = () => expulsarJugador(jugador.id);
+
+    div.appendChild(btnExpulsar);
+}
       const select = document.createElement("select");
       equipos.forEach((equipo, i) => {
         const opt = document.createElement("option");
