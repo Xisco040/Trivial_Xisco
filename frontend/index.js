@@ -18,7 +18,7 @@ let respuestasRonda = 0;
 let puntuaciones = {};
 let enPartida = false;
 let clasificacionMostrada = false;
-let desfaseReloj = 0; 
+let desfaseReloj = 0;
 let temporizadorActual = null;
 
 // Estado del lobby
@@ -272,12 +272,12 @@ function mostrarEquiposLobby() {
     // Solo el anfitrión o el propio jugador puede cambiar su equipo
     if (esAnfitrion() || jugador.id === jugadorActualId) {
       if (esAnfitrion() && jugador.id !== jugadorActualId) {
-    const btnExpulsar = document.createElement("button");
-    btnExpulsar.textContent = "Expulsar";
-    btnExpulsar.onclick = () => expulsarJugador(jugador.id);
+        const btnExpulsar = document.createElement("button");
+        btnExpulsar.textContent = "Expulsar";
+        btnExpulsar.onclick = () => expulsarJugador(jugador.id);
 
-    div.appendChild(btnExpulsar);
-}
+        div.appendChild(btnExpulsar);
+      }
       const select = document.createElement("select");
       equipos.forEach((equipo, i) => {
         const opt = document.createElement("option");
@@ -460,7 +460,7 @@ async function enviarRespuesta(respuesta) {
 // Finaliza la ronda
 async function finalizarRonda() {
   document.getElementById("timer").textContent = "¡Tiempo!";
-  await esperar(800); 
+  await esperar(800);
 
   let preguntas = await reintentar(() => api(`/questions?roundId=${rondaActual.id}`));
   for (let i = 0; i < 5 && !(preguntas[0].correctAnswers || []).length; i++) {
